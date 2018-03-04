@@ -101,7 +101,7 @@ $(document).ready(function() {
 	
 	RefreshMatrices();
 	
-	var maxTraining = 50;
+	var maxTraining = 100;
 	
 	var loop = setInterval(function() {
 		svd.factorize(matrix, latentWide, latentTall, predictions, error, 1);
