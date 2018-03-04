@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<link rel="stylesheet" href="ui.css">
 	
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-31183365-5"></script>
@@ -25,7 +26,29 @@
 			<p>Scott Clayton 2018</p>
 		</div>
 	</div>
+	<div class="row">
+		<div class="col-md-5">
+			<h2>Original Matrix</h2>
+			<div id="matrixActual"></div>
+		</div>
+		<div class="col-md-7">
+			<h2>Decomposed Matrix</h2>
+			<div id="matrixPredict"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<h2>Error Matrix</h2>
+			<div id="matrixError"></div>
+			<div><strong>RMSE:</strong> <span id="rmse"></span></div>
+			<div><strong>Iterations:</strong> <span id="iterations"></span></div>
+		</div>
+		<div class="col-md-7">
+		</div>
+	</div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="svd.js"></script>
+<script src="ui.js"></script>
 </body>
 </html>
