@@ -1,70 +1,72 @@
 // Visual SVD
 // Scott Clayton
-$(document).ready(function() {
+var RefreshMatrices = function () {};
+
+var rows = 5;
+var cols = 5;
+var features = 3;
+
+var matrix = [
+	[0,9,0,0,10],
+	[3,0,0,5,0],
+	[0,1,0,0,0],
+	[0,5,1,0,3],
+	[0,0,0,0,7]
+];
+
+var predictions = [
+	[0,0,0,0,0],
+	[0,0,0,0,0],
+	[0,0,0,0,0],
+	[0,0,0,0,0],
+	[0,0,0,0,0]
+];
+
+var error = [
+	[0,0,0,0,0],
+	[0,0,0,0,0],
+	[0,0,0,0,0],
+	[0,0,0,0,0],
+	[0,0,0,0,0]
+];
+
+var latentWide = [
+	[0.899, 0.762, 0.870],
+	[0.922, 0.771, 0.439],
+	[0.767, 0.939, 0.877],
+	[0.498, 0.691, 0.301],
+	[0.985, 0.067, 0.241]
+];
+
+var latentTall = [
+	[0.571, 0.171, 0.634],
+	[0.466, 0.181, 0.921],
+	[0.841, 0.648, 0.492],
+	[0.728, 0.671, 0.091],
+	[0.649, 0.721, 0.699]
+];
+
+var $matrixActual = $("#matrixActual");
+var $matrixPredict = $("#matrixPredict");
+var $matrixError = $("#matrixError");
+var $rmse = $("#rmse");
+var $iterations = $("#iterations");
+
+$(document).ready(function() {	
 	
-	var rows = 5;
-	var cols = 5;
-	var features = 3;
-	
-	var matrix = [
-		[0,9,0,0,10],
-		[3,0,0,5,0],
-		[0,1,0,0,0],
-		[0,5,1,0,3],
-		[0,0,0,0,7]
-	];
-	
-	var predictions = [
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0]
-	];
-	
-	var error = [
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,0,0]
-	];
-	
-	var latentWide = [
-		[0.899, 0.762, 0.870],
-		[0.922, 0.771, 0.439],
-		[0.767, 0.939, 0.877],
-		[0.498, 0.691, 0.301],
-		[0.985, 0.067, 0.241]
-	];
-	
-	var latentTall = [
-		[0.571, 0.171, 0.634],
-		[0.466, 0.181, 0.921],
-		[0.841, 0.648, 0.492],
-		[0.728, 0.671, 0.091],
-		[0.649, 0.721, 0.699]
-	];
-	
-	var $matrixActual = $("#matrixActual");
-	var $matrixPredict = $("#matrixPredict");
-	var $matrixError = $("#matrixError");
-	var $rmse = $("#rmse");
-	var $iterations = $("#iterations");
-	
-	CreateMatrixElements($matrixActual, rows, cols, 0);
+	CreateMatrixInputs($matrixActual, rows, cols);
 	CreateMatrixElements($matrixPredict, rows, cols, features);
 	CreateMatrixElements($matrixError, rows, cols, 0);
-	
-	var RefreshMatrices = function () {
+		
+	RefreshMatrices = function () {
 		
 		// Update the known values matrix
 		for (var r = 0; r < rows; r++) {
 			for (var c = 0; c < cols; c++) {
 				UpdateMatrixValue($matrixActual, r, c, matrix[r][c]);
 			}
-		}	
-		
+		}
+	
 		// Update the latent feature matrices
 		for (var r = rows; r < rows + features; r++) {
 			for (var c = 0; c < cols; c++) {
@@ -83,6 +85,8 @@ $(document).ready(function() {
 				UpdateMatrixValue($matrixPredict, r, c, predictions[r][c]);
 				if (matrix[r][c] == 0) {
 					AddMatrixClass($matrixPredict, r, c, "m-predict");
+				} else {
+					RemoveMatrixClass($matrixPredict, r, c, "m-predict");
 				}
 			}
 		}
@@ -100,6 +104,19 @@ $(document).ready(function() {
 	};
 	
 	RefreshMatrices();
+});
+
+$("#btnGo").click(function() {
+	
+	$("#btnGo").hide();
+	
+	for (var r = 0; r < rows; r++) {
+		for (var c = 0; c < cols; c++) {
+			matrix[r][c] = +$matrixActual.children().eq(r).children().eq(c).val();
+		}
+	}	
+		
+	RefreshMatrices();
 	
 	var maxTraining = 100;
 	
@@ -113,6 +130,7 @@ $(document).ready(function() {
 		if (svd.totalIterations >= maxTraining) {
 			clearInterval(loop);
 			console.log("Done!");
+			//$("#btnGo").show();
 		}
 	}, 1000);
 });
@@ -137,6 +155,18 @@ var CreateMatrixElements = function ($matrix, rows, cols, features) {
 	}
 };
 
+// Create the <input> elements that make up a matrix
+var CreateMatrixInputs = function ($matrix, rows, cols) {
+	for (var r = 0; r < rows; r++) {
+		var newRow = $("<div></div>");
+		for (var c = 0; c < cols; c++) {
+			var newCol = $("<input type=\"text\" class=\"m-cell" + (c >= cols ? " m-feat" : " m-empty") + "\" />");
+			newRow.append(newCol);
+		}
+		$matrix.append(newRow);
+	}
+};
+
 // Set the value and appropriate class of a cell in the matrix
 var UpdateMatrixValue = function ($matrix, row, col, value) {
 	ChangeMatrixValue($matrix, row, col, value);
@@ -146,7 +176,7 @@ var UpdateMatrixValue = function ($matrix, row, col, value) {
 
 // Set the value of a specific cell in a matrix
 var ChangeMatrixValue = function ($matrix, row, col, value) {
-	$matrix.children().eq(row).children().eq(col).html(+value.toFixed(2));
+	$matrix.children().eq(row).children().eq(col).html(+value.toFixed(2)).val(+value.toFixed(2));
 };
 
 // Set a class of a specific cell in a matrix
